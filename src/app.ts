@@ -15,6 +15,7 @@ import {
   UpdateBadgeArgs,
   DisplayBannerArgs,
   MobileMenuItem,
+  ChatPreprocessor,
 } from './types.js';
 
 import {
@@ -80,6 +81,13 @@ declare global {
   var _setPluginId: Function;
   var _configurePlugin: Function;
   var Wazo: any;
+
+  // Used for chat preprocessing
+  interface Window {
+    wazoChat?: {
+      preprocessMessage?: ChatPreprocessor;
+    };
+  }
 }
 
 const initializationTimeoutInMs = 5000;
@@ -275,6 +283,52 @@ export class App {
   displayBanner = (args: DisplayBannerArgs) => this._sendMessage(EVENT_DISPLAY_BANNER, { ...args, entityId: this._entityId || 'display-banner-null-entity-id' });
 
   closeBanner = () => this._sendMessage(EVENT_REMOVE_BANNER, { entityId: this._entityId || 'remove-banner-null-entity-id' });
+
+  /**
+   * Register a function to preprocess chat messages before they are sent.
+   * The preprocessor can modify message content or cancel the sending by returning null.
+   *
+   * @param callback - Async function that receives roomUuid and message, returns modified message or null
+   *
+   * @example
+   * app.setChatPreprocessor(async (roomUuid, message) => {
+   *   return { ...message, content: `[Plugin] ${message.content}` };
+   * });
+   */
+  setChatPreprocessor = (callback: ChatPreprocessor): void => {
+    if (typeof callback !== 'function') {
+      throw new TypeError('setChatPreprocessor: callback must be a function');
+    }
+
+    if (this.hasChatPreprocessor()) {
+      console.warn('[EUC Plugins SDK] Overwriting existing chat preprocessor');
+    }
+
+    if (!window.wazoChat) {
+      window.wazoChat = {};
+    }
+
+    window.wazoChat.preprocessMessage = callback;
+    console.log('[EUC Plugins SDK] Chat preprocessor registered');
+  };
+
+  /**
+   * Remove the currently registered chat preprocessor.
+   * After calling this, messages will be sent without preprocessing.
+   */
+  removeChatPreprocessor = (): void => {
+    if (window.wazoChat) {
+      delete window.wazoChat.preprocessMessage;
+      console.log('[EUC Plugins SDK] Chat preprocessor removed');
+    }
+  };
+
+  /**
+   * Check if a chat preprocessor is currently registered.
+   *
+   * @returns boolean - true if a preprocessor is active
+   */
+  hasChatPreprocessor = (): boolean => !!(window.wazoChat?.preprocessMessage);
 
   // Portal
   changeToolbarDisplay = (display: boolean) => this._sendMessage(EVENT_CHANGE_TOOLBAR_DISPLAY, { display });

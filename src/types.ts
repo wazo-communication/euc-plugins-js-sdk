@@ -267,3 +267,17 @@ export type MobileMenuItem = {
   label: string,
   id: string,
 }
+
+// Chat Preprocessor Types
+export type ChatMessage = {
+  content: string;
+  roomUuid?: string;
+  userUuid?: string;
+  createdAt?: string;
+  [key: string]: unknown;
+};
+
+export type ChatPreprocessor = (
+  roomUuid: string,
+  message: ChatMessage
+) => Promise<ChatMessage | null>;
