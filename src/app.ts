@@ -65,6 +65,8 @@ import {
   EVENT_ON_CONNECTED_TO_STACK,
   EVENT_ON_SWITCH_STACK_TENANT,
   EVENT_CHANGE_TOOLBAR_DISPLAY,
+  EVENT_SWITCH_PORTAL_TENANT,
+  EVENT_SWITCH_STACK_TENANT,
   EVENT_MOBILE_HEADER,
   EVENT_MOBILE_CONTEXTUAL_MENU,
   EVENT_MOBILE_SHOW_BOTTOM_NAV,
@@ -278,6 +280,10 @@ export class App {
 
   // Portal
   changeToolbarDisplay = (display: boolean) => this._sendMessage(EVENT_CHANGE_TOOLBAR_DISPLAY, { display });
+
+  switchPortalTenant = (uuid: string) => this._sendMessage(EVENT_SWITCH_PORTAL_TENANT, { tenant: { uuid } });
+
+  switchStackTenant = (uuid: string) => this._sendMessage(EVENT_SWITCH_STACK_TENANT, { tenant: { uuid } });
 
   // App to Mobile
   setMobileHeader = ({ title, callback }: { title?: string | null, callback?: Function | null }, entityId?: string) => {
