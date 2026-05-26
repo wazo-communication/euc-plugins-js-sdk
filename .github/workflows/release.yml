@@ -20,5 +20,6 @@ jobs:
       - name: Update npm
         run: npm install -g npm@latest
       - run: yarn install --frozen-lockfile
+      - run: yarn build
       - run: yarn test:node
       - run: npm publish --provenance --access public
