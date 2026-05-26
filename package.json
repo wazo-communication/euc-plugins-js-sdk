@@ -13,7 +13,7 @@
   "homepage": "https://github.com/wazo-communication/euc-plugins-js-sdk",
   "repository": {
     "type": "git",
-    "url": "https://github.com/wazo-communication/euc-plugins-js-sdk"
+    "url": "git+https://github.com/wazo-communication/euc-plugins-js-sdk.git"
   },
   "bugs": {
     "url": "https://github.com/wazo-communication/euc-plugins-js-sdk/issues"
