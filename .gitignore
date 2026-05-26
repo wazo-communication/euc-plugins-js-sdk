@@ -1,3 +1,6 @@
 lib
 node_modules
 .vscode
+
+# Override global ~/.gitignore: .nvmrc is our source of truth for the dev Node version
+!.nvmrc

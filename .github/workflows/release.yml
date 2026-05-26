@@ -1,28 +1,24 @@
 name: Release
+
 on:
-  workflow_run:
-    workflows: ['Tests']
-    branches: [master]
-    types:
-      - completed
+  release:
+    types: [created]
+  workflow_dispatch:
 
 jobs:
-  release:
-    name: Release
+  build:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write # Required for OIDC trusted publishing
+      contents: read
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
-          fetch-depth: 0
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 'lts/*'
-      - name: Install dependencies
-        run: yarn install --frozen-lockfile
-      - name: Release
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npx semantic-release
+          node-version-file: ".nvmrc"
+      # Ensure npm 11.5.1 or later is installed for trusted publishing
+      - name: Update npm
+        run: npm install -g npm@latest
+      - run: yarn install --frozen-lockfile
+      - run: yarn test:node
+      - run: npm publish --provenance --access public
